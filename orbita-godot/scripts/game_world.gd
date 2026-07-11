@@ -14,13 +14,17 @@ var current_rotation = 0.0
 var pulse_angle = 0.0
 var reverse_timer_current = 0.0
 
-var pins_on_core = [] # Array of angles (float)
-var flying_pin = null # Dictionary: {y, is_risk}
+var pins_on_core = []
+var flying_pin = null
 var pins_left = 0
 
 var state = "playing" # playing, cleared, failed
 var risk_active = false
 var combo = 0
+
+# Jokers
+var shield_active = false
+var slow_timer = 0.0
 
 func setup(data):
     level_data = data
@@ -30,8 +34,16 @@ func setup(data):
 func _process(delta):
     if state != "playing": return
     
+    # Joker: Slow Pulse
+    var speed_mult = 1.0
+    if slow_timer > 0:
+        slow_timer -= delta
+        speed_mult = 0.4
+        if slow_timer <= 0:
+            status_updated.emit("Yavaslatici Bitti!")
+            
     # Update Core Rotation
-    var current_speed = level_data["speed"]
+    var current_speed = level_data["speed"] * speed_mult
     if level_data["reverse_timer"] > 0:
         reverse_timer_current += delta
         if reverse_timer_current > level_data["reverse_timer"]:
@@ -40,7 +52,7 @@ func _process(delta):
             status_updated.emit("YON DEGISIYOR!")
             
     current_rotation = fmod(current_rotation + current_speed * delta, PI * 2)
-    pulse_angle = fmod(pulse_angle + level_data["pulse_speed"] * delta, PI * 2)
+    pulse_angle = fmod(pulse_angle + level_data["pulse_speed"] * speed_mult * delta, PI * 2)
     
     # Update Flying Pin
     if flying_pin != null:
@@ -61,6 +73,14 @@ func toggle_risk():
         risk_active = !risk_active
         status_updated.emit("RISK MODU: " + ("ACIK" if risk_active else "KAPALI"))
 
+func activate_shield():
+    shield_active = true
+    status_updated.emit("KALKAN AKTIF!")
+
+func activate_slow():
+    slow_timer = 2.5
+    status_updated.emit("ZAMAN YAVASLADI!")
+
 func shoot_pin():
     pins_left -= 1
     flying_pin = {"y": 700.0, "is_risk": risk_active}
@@ -71,7 +91,7 @@ func _attach_pin():
     
     # Collision Logic
     var safe_dist = 0.25 # radians (~14 degrees)
-    if flying_pin["is_risk"]: safe_dist = 0.4 # Shrink safe zone in risk mode
+    if flying_pin["is_risk"]: safe_dist = 0.4 
     
     var collided = false
     for p in pins_on_core:
@@ -82,11 +102,18 @@ func _attach_pin():
             break
             
     if collided:
-        state = "failed"
-        game_over.emit()
-        flying_pin = null
-        queue_redraw()
-        return
+        if shield_active:
+            shield_active = false
+            status_updated.emit("KALKAN KIRILDI! (Kurtuldun)")
+            flying_pin = null
+            queue_redraw()
+            return
+        else:
+            state = "failed"
+            game_over.emit()
+            flying_pin = null
+            queue_redraw()
+            return
         
     # Pulse Logic
     var pulse_diff = abs(attach_angle - fmod(-pulse_angle + PI*2, PI*2))
@@ -118,6 +145,10 @@ func _draw():
         for i in range(p_points.size() - 1):
             draw_line(p_points[i], p_points[i+1], Color(0, 0.8, 0.8, 0.3), 2.0)
     
+    # Shield effect
+    if shield_active:
+        draw_circle(center, core_radius + 8, Color(0, 1, 0, 0.3))
+        
     # Draw Core
     var core_color = Color(0.8, 0.2, 0.2) if risk_active else Color(0.0, 0.8, 0.8)
     draw_circle(center, core_radius, core_color)
