@@ -22,14 +22,14 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Install Godot 4.3
+      - name: Download Godot 4.3
         run: |
           wget -q https://github.com/godotengine/godot/releases/download/4.3-stable/Godot_v4.3-stable_linux.x86_64.zip
           unzip -q Godot_v4.3-stable_linux.x86_64.zip
           sudo mv Godot_v4.3-stable_linux.x86_64 /usr/local/bin/godot
           sudo chmod +x /usr/local/bin/godot
 
-      - name: Install Godot Export Templates
+      - name: Download Godot Export Templates
         run: |
           wget -q https://github.com/godotengine/godot/releases/download/4.3-stable/Godot_v4.3-stable_export_templates.tpz
           mkdir -p ~/.local/share/godot/export_templates/4.3.stable
@@ -38,29 +38,25 @@ jobs:
 
       - name: Generate Debug Keystore
         run: |
-          cd orbita-godot
           keytool -keyalg RSA -genkeypair -alias androiddebugkey -keypass android -keystore debug.keystore -storepass android -dname "CN=Android Debug,O=Android,C=US" -validity 9999
 
-      - name: Fix Editor Settings
+      - name: Setup Editor Settings
         run: |
           mkdir -p ~/.config/godot
           cat <<'SETTINGSEOF' > ~/.config/godot/editor_settings-4.tres
           [gd_resource type="EditorSettings" format=3]
           [resource]
           export/android/android_sdk_path = "/usr/local/lib/android/sdk"
-          export/android/debug_keystore = "${GITHUB_WORKSPACE}/orbita-godot/debug.keystore"
+          export/android/debug_keystore = "KEYSTORE_PATH"
           export/android/debug_keystore_user = "androiddebugkey"
           export/android/debug_keystore_pass = "android"
           SETTINGSEOF
-          sed -i "s|\${GITHUB_WORKSPACE}|${GITHUB_WORKSPACE}|g" ~/.config/godot/editor_settings-4.tres
+          sed -i "s|KEYSTORE_PATH|${GITHUB_WORKSPACE}/debug.keystore|g" ~/.config/godot/editor_settings-4.tres
 
-      - name: Pre-import assets (Fixes missing config on first run)
+      - name: Pre-import assets
         run: |
           cd orbita-godot
           godot --headless --editor --quit || true
-
-      - name: Verify keystore path exists
-        run: ls -la ${GITHUB_WORKSPACE}/orbita-godot/debug.keystore
 
       - name: Build APK
         run: |
@@ -69,7 +65,6 @@ jobs:
           godot --headless --export-debug "Android" build/ORBITA_Flow_Arena_v0.1.apk
 
       - name: Upload APK Artifact
-        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: ORBITA-Flow-Arena-APK
