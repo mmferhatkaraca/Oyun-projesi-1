@@ -65,7 +65,7 @@ jobs:
         run: |
           cd orbita-godot
           mkdir -p build
-          godot --headless --export-debug "Android" build/ORBITA_Flow_Arena_v0.1.apk
+          godot --headless --verbose --export-debug "Android" build/ORBITA_Flow_Arena_v0.1.apk
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
