@@ -1,0 +1,69 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  export-android:
+    name: Build APK
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Godot 4.3
+        run: |
+          wget https://github.com/godotengine/godot/releases/download/4.3-stable/Godot_v4.3-stable_linux.x86_64.zip
+          unzip Godot_v4.3-stable_linux.x86_64.zip
+          sudo mv Godot_v4.3-stable_linux.x86_64 /usr/local/bin/godot
+          sudo chmod +x /usr/local/bin/godot
+
+      - name: Install Godot Export Templates
+        run: |
+          wget https://github.com/godotengine/godot/releases/download/4.3-stable/Godot_v4.3-stable_export_templates.tpz
+          mkdir -p ~/.local/share/godot/export_templates/4.3.stable
+          unzip Godot_v4.3-stable_export_templates.tpz -d /tmp/templates
+          mv /tmp/templates/templates/* ~/.local/share/godot/export_templates/4.3.stable/
+
+      - name: Generate Debug Keystore
+        run: |
+          cd orbita-godot
+          keytool -keyalg RSA -genkeypair -alias androiddebugkey -keypass android -keystore debug.keystore -storepass android -dname "CN=Android Debug,O=Android,C=US" -validity 9999
+
+      - name: Configure Godot Editor Settings for Android
+        run: |
+          mkdir -p ~/.config/godot
+          cat <<'SETTINGSEOF' > ~/.config/godot/editor_settings-4.tres
+          [gd_resource type="EditorSettings" format=3]
+          [resource]
+          export/android/android_sdk_path = "/usr/local/lib/android/sdk"
+          export/android/debug_keystore = "${GITHUB_WORKSPACE}/orbita-godot/debug.keystore"
+          export/android/debug_keystore_user = "androiddebugkey"
+          export/android/debug_keystore_pass = "android"
+          export/android/force_system_user = false
+          SETTINGSEOF
+          # Resolve the GITHUB_WORKSPACE variable in the file
+          sed -i "s|\${GITHUB_WORKSPACE}|${GITHUB_WORKSPACE}|g" ~/.config/godot/editor_settings-4.tres
+
+      - name: Build APK (Export)
+        run: |
+          cd orbita-godot
+          mkdir -p build
+          godot --headless --export-debug "Android" build/ORBITA_Flow_Arena_v0.1.apk
+
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ORBITA-Flow-Arena-APK
+          path: orbita-godot/build/ORBITA_Flow_Arena_v0.1.apk
