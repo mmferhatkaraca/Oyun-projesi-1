@@ -15,6 +15,10 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      - name: Install Android 34 SDK
+        run: |
+          yes | /usr/lib/android-sdk/cmdline-tools/latest/bin/sdkmanager --sdk_root=/usr/lib/android-sdk "build-tools;34.0.0" "platforms;android-34" "platform-tools"
+
       - name: Setup Templates and Editor Settings
         run: |
           mkdir -v -p ~/.local/share/godot/export_templates
@@ -33,9 +37,9 @@ jobs:
       - name: Configure Project Preset
         run: |
           cd orbita-godot
-          # Remove any existing keystore lines
+          # Reset target_sdk to 34
+          sed -i 's/target_sdk=33/target_sdk=34/g' export_presets.cfg
           sed -i '/keystore\/debug/d' export_presets.cfg
-          # Add them explicitly with the container's known keystore
           sed -i '/\[preset.0.options\]/a keystore/debug="/root/debug.keystore"\nkeystore/debug_user="androiddebugkey"\nkeystore/debug_password="android"' export_presets.cfg
 
       - name: Pre-import assets
