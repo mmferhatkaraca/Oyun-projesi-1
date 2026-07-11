@@ -15,34 +15,39 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Setup Templates
+      - name: Setup Templates and Editor Settings
         run: |
           mkdir -v -p ~/.local/share/godot/export_templates
           mv /root/.local/share/godot/export_templates/4.3.stable ~/.local/share/godot/export_templates/4.3.stable
-
-      - name: Prepare Keystore in Editor Settings
-        run: |
+          
           mkdir -p ~/.config/godot
-          cat <<'SETTINGSEOF' > ~/.config/godot/editor_settings-4.tres
+          REAL_JAVA_PATH=$(dirname $(dirname $(readlink -f $(which java))))
+          
+          cat <<SETTINGSEOF > ~/.config/godot/editor_settings-4.tres
           [gd_resource type="EditorSettings" format=3]
           [resource]
           export/android/android_sdk_path = "/usr/lib/android-sdk"
-          export/android/java_sdk_path = "JAVA_SDK_PATH"
-          export/android/debug_keystore = "/root/debug.keystore"
-          export/android/debug_keystore_user = "androiddebugkey"
-          export/android/debug_keystore_pass = "android"
+          export/android/java_sdk_path = "$REAL_JAVA_PATH"
           SETTINGSEOF
-          
-          # Find the exact Java path inside the container and inject it
-          REAL_JAVA_PATH=$(dirname $(dirname $(readlink -f $(which java))))
-          echo "Found Java SDK at: $REAL_JAVA_PATH"
-          sed -i "s|JAVA_SDK_PATH|$REAL_JAVA_PATH|g" ~/.config/godot/editor_settings-4.tres
+
+      - name: Configure Project Preset
+        run: |
+          cd orbita-godot
+          # Remove any existing keystore lines
+          sed -i '/keystore\/debug/d' export_presets.cfg
+          # Add them explicitly with the container's known keystore
+          sed -i '/\[preset.0.options\]/a keystore/debug="/root/debug.keystore"\nkeystore/debug_user="androiddebugkey"\nkeystore/debug_password="android"' export_presets.cfg
+
+      - name: Pre-import assets
+        run: |
+          cd orbita-godot
+          godot --headless --editor --quit || true
 
       - name: Export APK
         run: |
           cd orbita-godot
           mkdir -p build
-          godot --headless --export-debug "Android" build/ORBITA_Flow_Arena_v0.1.apk
+          godot --headless --verbose --export-debug "Android" build/ORBITA_Flow_Arena_v0.1.apk
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
