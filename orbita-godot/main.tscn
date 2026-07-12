@@ -1,0 +1,67 @@
+[gd_scene load_steps=2 format=3 uid="uid://cx4y1"]
+
+[ext_resource type="Script" path="res://main.gd" id="1_main"]
+
+[node name="Main" type="Node2D"]
+script = ExtResource("1_main")
+
+[node name="Camera2D" type="Camera2D" parent="."]
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="TopBar" type="PanelContainer" parent="UI"]
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 120.0
+grow_horizontal = 2
+
+[node name="HBox" type="HBoxContainer" parent="UI/TopBar"]
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 50
+
+[node name="FoodLbl" type="Label" parent="UI/TopBar/HBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.9, 0.4, 1)
+theme_override_font_sizes/font_size = 42
+text = "🌾 Food: 0"
+
+[node name="WoodLbl" type="Label" parent="UI/TopBar/HBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.6, 0.3, 1)
+theme_override_font_sizes/font_size = 42
+text = "🪵 Wood: 0"
+
+[node name="BottomBar" type="PanelContainer" parent="UI"]
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -140.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="BtnFarm" type="Button" parent="UI/BottomBar"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.8, 0.2, 1)
+theme_override_font_sizes/font_size = 46
+text = "🔨 Çiftlik Kur (100 Odun)"
+
+[node name="Toast" type="Label" parent="UI"]
+visible = false
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -300.0
+offset_top = -50.0
+offset_right = 300.0
+offset_bottom = 50.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(1, 0.8, 0, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_constants/shadow_outline_size = 10
+theme_override_font_sizes/font_size = 56
+horizontal_alignment = 1
