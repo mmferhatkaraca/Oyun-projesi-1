@@ -49,6 +49,9 @@ public class MainActivity extends Activity {
         btnShield = findViewById(R.id.btnShield);
         btnRisk = findViewById(R.id.btnRisk);
 
+        // Force game view to be visible behind the menu initially
+        gameView.setVisibility(View.VISIBLE);
+
         btnPlay.setOnClickListener(v -> startGame());
         btnNext.setOnClickListener(v -> {
             if (lblResultTitle.getText().toString().contains("GEÇİLDİ")) {
@@ -79,6 +82,9 @@ public class MainActivity extends Activity {
         menuUI.setVisibility(View.GONE);
         resultUI.setVisibility(View.GONE);
         hudUI.setVisibility(View.VISIBLE);
+        gameView.setVisibility(View.VISIBLE);
+        gameView.bringToFront();
+        hudUI.bringToFront();
         
         LevelData data = LevelData.getLevel(currentLevelId);
         lblLevel.setText("LEVEL " + currentLevelId + ": " + data.name);
@@ -100,6 +106,7 @@ public class MainActivity extends Activity {
     public void showResult(boolean isWin) {
         hudUI.setVisibility(View.GONE);
         resultUI.setVisibility(View.VISIBLE);
+        resultUI.bringToFront();
         if (isWin) {
             lblResultTitle.setText("LEVEL GEÇİLDİ!");
             lblResultTitle.setTextColor(Color.parseColor("#1dd1a1"));
