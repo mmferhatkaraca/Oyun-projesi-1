@@ -11,6 +11,7 @@ public class MainActivity extends Activity {
     private GameView gameView;
     private TextView txtFood, txtWood;
     
+    // Player Resources
     public int food = 500;
     public int wood = 1000;
 
@@ -18,6 +19,7 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
+        // Immersive Fullscreen
         getWindow().getDecorView().setSystemUiVisibility(
             View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY |
             View.SYSTEM_UI_FLAG_FULLSCREEN |
@@ -42,13 +44,14 @@ public class MainActivity extends Activity {
             }
         });
 
+        // Resource Generator Loop
         new Thread(() -> {
             while(true) {
                 try {
                     Thread.sleep(1000);
                     int farmCount = gameView.getBuildingCount("farm");
                     if (farmCount > 0) {
-                        food += farmCount * 10;
+                        food += farmCount * 5;
                         updateUI();
                     }
                 } catch (Exception e) {}
