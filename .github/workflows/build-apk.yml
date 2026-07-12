@@ -18,15 +18,10 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Install Gradle Wrapper
-        run: |
-          cd android-project
-          gradle wrapper
-
       - name: Make gradlew executable
         run: |
           cd android-project
-          chmod +x ./gradlew
+          chmod +x ./gradlew || true
 
       - name: Build APK with Gradle
         run: |
