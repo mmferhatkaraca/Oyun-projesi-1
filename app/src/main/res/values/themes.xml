@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.Orbita" parent="android:Theme.Material.Light.NoActionBar">
-        <item name="android:windowFullscreen">true</item>
-        <item name="android:windowBackground">#0B0C10</item>
-        <item name="android:statusBarColor">#0B0C10</item>
-        <item name="android:navigationBarColor">#0B0C10</item>
+    <style name="Theme.Archiver" parent="android:Theme.Material.Light.DarkActionBar">
+        <item name="android:colorPrimary">#1976D2</item>
+        <item name="android:colorPrimaryDark">#115293</item>
+        <item name="android:colorAccent">#FF4081</item>
     </style>
 </resources>
