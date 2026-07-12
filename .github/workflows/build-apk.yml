@@ -1,4 +1,4 @@
-name: Build Native Android APK
+name: Build Native Android Studio APK
 
 on:
   push:
@@ -18,13 +18,20 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
+      - name: Make gradlew executable
+        run: |
+          cd android-project
+          chmod +x ./gradlew || true
+
       - name: Build APK with Gradle
         run: |
           cd android-project
-          gradle assembleDebug
+          # Forcing a generic wrapper creation just in case
+          gradle wrapper
+          ./gradlew assembleDebug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: ORBITA-Flow-Arena-Final
+          name: ORBITA-Flow-Arena-Native-Android
           path: android-project/app/build/outputs/apk/debug/app-debug.apk
