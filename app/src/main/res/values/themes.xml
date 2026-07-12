@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.Archiver" parent="android:Theme.Material.Light.DarkActionBar">
-        <item name="android:colorPrimary">#1976D2</item>
-        <item name="android:colorPrimaryDark">#115293</item>
-        <item name="android:colorAccent">#FF4081</item>
+    <style name="Theme.Archiver" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">#00D2D3</item>
+        <item name="colorSecondary">#FF9F43</item>
+        <item name="android:statusBarColor">#121212</item>
+        <item name="android:windowBackground">#121212</item>
     </style>
 </resources>
