@@ -13,14 +13,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import java.util.zip.ZipInputStream;
-
-import org.apache.commons.compress.archivers.sevenz.SevenZArchiveEntry;
-import org.apache.commons.compress.archivers.sevenz.SevenZFile;
-import com.github.junrar.Junrar;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -105,81 +100,31 @@ public class MainActivity extends AppCompatActivity {
                 String originalName = getFileName(uri);
                 log("> Arşiv analiz ediliyor: " + originalName);
                 
-                // Güvenli kopyalama (Android SAF kısıtlamalarını aşmak için Cache'e alırız)
-                File tempFile = new File(getCacheDir(), "temp_" + System.currentTimeMillis() + "_" + originalName);
-                try (InputStream is = getContentResolver().openInputStream(uri);
-                     OutputStream os = new FileOutputStream(tempFile)) {
-                    byte[] buffer = new byte[8192];
-                    int read;
-                    while ((read = is.read(buffer)) != -1) {
-                        os.write(buffer, 0, read);
-                    }
-                }
-                
-                // Çıktı klasörü oluştur
-                String folderName = originalName.contains(".") ? originalName.substring(0, originalName.lastIndexOf('.')) : originalName;
-                File outDir = new File(getExternalFilesDir(null), "Extracted_" + folderName);
+                File outDir = new File(getExternalFilesDir(null), "Extracted_" + System.currentTimeMillis());
                 outDir.mkdirs();
                 
-                log("> İşlem Başlatıldı. Hedef format tespit ediliyor...");
-                String lowerName = originalName.toLowerCase();
-                
-                // RAR DESTEĞİ
-                if (lowerName.endsWith(".rar")) {
-                    log("> RAR motoru (Junrar) devrede...");
-                    Junrar.extract(tempFile, outDir);
-                    log("> RAR Arşivi başarıyla çıkarıldı!");
-                } 
-                // 7Z DESTEĞİ
-                else if (lowerName.endsWith(".7z")) {
-                    log("> 7Z motoru (Apache Commons) devrede...");
-                    try (SevenZFile sevenZFile = new SevenZFile(tempFile)) {
-                        SevenZArchiveEntry entry;
-                        while ((entry = sevenZFile.getNextEntry()) != null) {
-                            if (entry.isDirectory()) continue;
-                            File outFile = new File(outDir, entry.getName());
-                            outFile.getParentFile().mkdirs();
-                            try (FileOutputStream out = new FileOutputStream(outFile)) {
-                                byte[] content = new byte[8192];
-                                int len;
-                                while ((len = sevenZFile.read(content)) > 0) {
-                                    out.write(content, 0, len);
-                                }
+                log("> ZIP motoru devrede...");
+                try (InputStream is = getContentResolver().openInputStream(uri);
+                     ZipInputStream zis = new ZipInputStream(is)) {
+                    ZipEntry entry;
+                    while ((entry = zis.getNextEntry()) != null) {
+                        if (entry.isDirectory()) continue;
+                        File outFile = new File(outDir, entry.getName());
+                        outFile.getParentFile().mkdirs();
+                        try (FileOutputStream fos = new FileOutputStream(outFile)) {
+                            byte[] buffer = new byte[8192];
+                            int len;
+                            while ((len = zis.read(buffer)) > 0) {
+                                fos.write(buffer, 0, len);
                             }
-                            log("  -> " + entry.getName());
                         }
+                        log("  -> " + entry.getName());
                     }
-                    log("> 7Z Arşivi başarıyla çıkarıldı!");
-                } 
-                // ZIP DESTEĞİ (Fallback)
-                else {
-                    log("> ZIP motoru devrede...");
-                    try (InputStream is = new FileInputStream(tempFile);
-                         ZipInputStream zis = new ZipInputStream(is)) {
-                        ZipEntry entry;
-                        while ((entry = zis.getNextEntry()) != null) {
-                            if (entry.isDirectory()) continue;
-                            File outFile = new File(outDir, entry.getName());
-                            outFile.getParentFile().mkdirs();
-                            try (FileOutputStream fos = new FileOutputStream(outFile)) {
-                                byte[] buffer = new byte[8192];
-                                int len;
-                                while ((len = zis.read(buffer)) > 0) {
-                                    fos.write(buffer, 0, len);
-                                }
-                            }
-                            log("  -> " + entry.getName());
-                        }
-                    }
-                    log("> ZIP Arşivi başarıyla çıkarıldı!");
                 }
-                
-                // Temizlik
-                tempFile.delete();
-                log("> İŞLEM TAMAMLANDI!\n> Klasör: " + outDir.getAbsolutePath());
+                log("> ZIP Arşivi başarıyla çıkarıldı!\n> Klasör: " + outDir.getAbsolutePath());
                 
             } catch(Exception e) {
-                log("> HATA: Arşiv bozuk veya format desteklenmiyor. " + e.getMessage());
+                log("> HATA: Lütfen geçerli bir ZIP arşivi seçin. " + e.getMessage());
             }
         }).start();
     }

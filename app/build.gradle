@@ -25,9 +25,5 @@ dependencies {
     implementation 'com.google.android.material:material:1.11.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     
-    // 7z, Tar, GZ desteği için Apache Commons
-    implementation 'org.apache.commons:commons-compress:1.26.1'
-    
-    // RAR desteği için Junrar
-    implementation 'com.github.junrar:junrar:7.5.5'
+    // We remove the problematic Junrar/Apache deps entirely for a pure, clean build.
 }
