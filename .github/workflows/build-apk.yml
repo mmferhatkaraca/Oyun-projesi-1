@@ -1,4 +1,4 @@
-name: Build Flow Arena Native APK
+name: Build Native Android Studio APK
 
 on:
   push:
@@ -19,15 +19,15 @@ jobs:
           java-version: '17'
 
       - name: Setup Gradle
-        run: |
-          chmod +x ./gradlew || true
+        uses: gradle/gradle-build-action@v2
 
-      - name: Build APK with Gradle
+      - name: Generate Wrapper and Build APK
         run: |
+          gradle wrapper
           ./gradlew assembleDebug
 
-      - name: Upload Native APK
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: ORBITA-Flow-Arena-Final
+          name: ORBITA-Flow-Arena-Native-Android
           path: app/build/outputs/apk/debug/app-debug.apk
