@@ -1,4 +1,4 @@
-name: Build Android APK (Manual Pack)
+name: Build Android APK
 
 on:
   push:
@@ -24,7 +24,7 @@ jobs:
 
       - name: Install Android Build Tools
         run: |
-          yes | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager "build-tools;34.0.0" "platforms;android-34"
+          yes | sdkmanager "build-tools;33.0.2" "platforms;android-33" "build-tools;34.0.0" "platforms;android-34"
 
       - name: Download Godot 4.3
         run: |
@@ -36,37 +36,46 @@ jobs:
       - name: Download Godot Android Template
         run: |
           wget -q https://github.com/godotengine/godot/releases/download/4.3-stable/Godot_v4.3-stable_export_templates.tpz
-          unzip -q Godot_v4.3-stable_export_templates.tpz templates/android_debug.apk
+          mkdir -p ~/.local/share/godot/export_templates/4.3.stable
+          unzip -q Godot_v4.3-stable_export_templates.tpz -d /tmp/templates
+          mv /tmp/templates/templates/* ~/.local/share/godot/export_templates/4.3.stable/
 
       - name: Generate Debug Keystore
         run: |
           keytool -keyalg RSA -genkeypair -alias androiddebugkey -keypass android -keystore debug.keystore -storepass android -dname "CN=Android Debug,O=Android,C=US" -validity 9999
 
-      - name: Export PCK
+      - name: Configure Godot Editor Settings
+        run: |
+          mkdir -p ~/.config/godot
+          cat <<SETTINGSEOF > ~/.config/godot/editor_settings-4.tres
+          [gd_resource type="EditorSettings" format=3]
+          [resource]
+          export/android/android_sdk_path = "${ANDROID_SDK_ROOT}"
+          export/android/java_sdk_path = "${JAVA_HOME}"
+          export/android/debug_keystore = "${GITHUB_WORKSPACE}/debug.keystore"
+          export/android/debug_keystore_user = "androiddebugkey"
+          export/android/debug_keystore_pass = "android"
+          SETTINGSEOF
+
+      - name: Configure Project Preset
+        run: |
+          cd orbita-godot
+          sed -i '/keystore\/debug/d' export_presets.cfg
+          sed -i "/\[preset.0.options\]/a keystore/debug=\"${GITHUB_WORKSPACE}/debug.keystore\"\nkeystore/debug_user=\"androiddebugkey\"\nkeystore/debug_password=\"android\"" export_presets.cfg
+
+      - name: Pre-import assets
+        run: |
+          cd orbita-godot
+          godot --headless --editor --quit || true
+
+      - name: Export APK
         run: |
           cd orbita-godot
           mkdir -p build
-          godot --headless --export-pack "PCK" build/orbita.pck
-
-      - name: Manually Package APK
-        run: |
-          # Copy base template
-          cp templates/android_debug.apk ORBITA_raw.apk
-          
-          # Inject PCK into assets/project.pck WITHOUT COMPRESSION (-0)
-          # Godot Android runner requires project.pck to be stored (not deflated) to memory map it.
-          mkdir -p assets
-          cp orbita-godot/build/orbita.pck assets/project.pck
-          zip -u -0 ORBITA_raw.apk assets/project.pck
-
-          # Align APK
-          $ANDROID_SDK_ROOT/build-tools/34.0.0/zipalign -p -f 4 ORBITA_raw.apk ORBITA_aligned.apk
-
-          # Sign APK
-          $ANDROID_SDK_ROOT/build-tools/34.0.0/apksigner sign --ks debug.keystore --ks-pass pass:android --key-pass pass:android ORBITA_aligned.apk
+          godot --headless --export-debug "Android" build/ORBITA_Flow_Arena_v0.1.apk
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: ORBITA-Flow-Arena-APK
-          path: ORBITA_aligned.apk
+          path: orbita-godot/build/ORBITA_Flow_Arena_v0.1.apk
