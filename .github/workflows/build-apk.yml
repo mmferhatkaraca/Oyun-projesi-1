@@ -18,11 +18,11 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Clean Output Directories
-        run: rm -rf app/build
-
-      - name: Force Clean Build
+      - name: Install and Run Gradle Wrapper
         run: |
+          wget -q https://services.gradle.org/distributions/gradle-8.5-bin.zip
+          unzip -q gradle-8.5-bin.zip
+          ./gradle-8.5/bin/gradle wrapper
           chmod +x ./gradlew
           ./gradlew clean assembleDebug
 
