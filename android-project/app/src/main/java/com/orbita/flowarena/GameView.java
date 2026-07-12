@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GameView extends SurfaceView implements SurfaceHolder.Callback {
-    private GameThread thread;
+    private GameThread thread = null;
     private MainActivity activity;
 
     private int width, height, centerX, centerY;
