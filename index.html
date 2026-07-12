@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Rise of Realms</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Oyun Sahnesi -->
+    <canvas id="gameCanvas"></canvas>
+
+    <!-- Üst Kaynak Paneli -->
+    <div id="topBar">
+        <div class="resource">
+            <span class="icon">🌾</span>
+            <span id="foodAmount">1000</span>
+        </div>
+        <div class="resource">
+            <span class="icon">🪵</span>
+            <span id="woodAmount">500</span>
+        </div>
+        <div class="resource">
+            <span class="icon">👑</span>
+            <span id="powerAmount">100</span>
+        </div>
+    </div>
+
+    <!-- Alt İnşa Et Paneli -->
+    <div id="bottomBar">
+        <button id="btnBuildMenu" class="action-btn">🔨 İNŞA ET</button>
+    </div>
+
+    <!-- İnşa Menüsü (Gizli) -->
+    <div id="buildMenu" class="hidden">
+        <div class="menu-header">
+            <h3>Binalar</h3>
+            <button id="btnCloseMenu">X</button>
+        </div>
+        <div class="building-list">
+            <div class="building-card" onclick="selectBuilding('farm')">
+                <div class="b-icon">🌾</div>
+                <div class="b-info">
+                    <h4>Çiftlik</h4>
+                    <p>Maliyet: 100 🪵</p>
+                </div>
+            </div>
+            <div class="building-card" onclick="selectBuilding('townhall')">
+                <div class="b-icon">🏰</div>
+                <div class="b-info">
+                    <h4>Belediye</h4>
+                    <p>Maliyet: 500 🪵</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Merkez Bildirim -->
+    <div id="toast" class="hidden"></div>
+
+    <script src="js/engine.js"></script>
+</body>
+</html>
