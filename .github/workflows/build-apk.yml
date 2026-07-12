@@ -18,13 +18,13 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Setup Gradle
-        uses: gradle/gradle-build-action@v2
+      - name: Clean Output Directories
+        run: rm -rf app/build
 
-      - name: Build APK with System Gradle
+      - name: Force Clean Build
         run: |
-          chmod +x ./gradlew || true
-          ./gradlew clean assembleDebug --no-daemon --no-build-cache
+          chmod +x ./gradlew
+          ./gradlew clean assembleDebug
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
