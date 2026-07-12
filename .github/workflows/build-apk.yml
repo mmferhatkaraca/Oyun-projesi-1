@@ -26,8 +26,6 @@ jobs:
       - name: Build APK with Gradle
         run: |
           cd android-project
-          # Use local gradle installation via wrapper
-          gradle wrapper
           ./gradlew assembleDebug
 
       - name: Upload APK
