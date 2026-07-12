@@ -53,10 +53,11 @@ jobs:
           # Copy base template
           cp templates/android_debug.apk ORBITA_raw.apk
           
-          # Inject PCK into assets/project.pck
+          # Inject PCK into assets/project.pck WITHOUT COMPRESSION (-0)
+          # Godot Android runner requires project.pck to be stored (not deflated) to memory map it.
           mkdir -p assets
           cp orbita-godot/build/orbita.pck assets/project.pck
-          zip -u ORBITA_raw.apk assets/project.pck
+          zip -u -0 ORBITA_raw.apk assets/project.pck
 
           # Align APK
           $ANDROID_SDK_ROOT/build-tools/34.0.0/zipalign -p -f 4 ORBITA_raw.apk ORBITA_aligned.apk
