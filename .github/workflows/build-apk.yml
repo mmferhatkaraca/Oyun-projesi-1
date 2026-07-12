@@ -26,7 +26,7 @@ jobs:
       - name: Build APK with Gradle
         run: |
           cd android-project
-          # Forcing a generic wrapper creation just in case
+          # Use local gradle installation via wrapper
           gradle wrapper
           ./gradlew assembleDebug
 
