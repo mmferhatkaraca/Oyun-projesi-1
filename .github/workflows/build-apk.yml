@@ -22,9 +22,9 @@ jobs:
         run: |
           chmod +x ./gradlew || true
 
-      - name: Build APK with Gradle
+      - name: Build APK with System Gradle
         run: |
-          ./gradlew assembleDebug
+          gradle assembleDebug
 
       - name: Check Artifact
         run: ls -la app/build/outputs/apk/debug/app-debug.apk || echo "APK BULUNAMADI"
