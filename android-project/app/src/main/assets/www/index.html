@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ORBITA</title>
+    <style>
+        body, html {
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            background-color: #0b0c10; color: #fff; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden; touch-action: none;
+        }
+        #gameCanvas {
+            display: block; width: 100%; height: 100%;
+        }
+        .ui-layer {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; text-align: center;
+        }
+        .hidden { display: none !important; }
+        
+        /* Typography & Colors */
+        h1 { font-size: 48px; margin-bottom: 10px; color: #00d2d3; text-shadow: 0 0 20px #00d2d3; font-weight: 800; letter-spacing: 4px; }
+        p.subtitle { font-size: 16px; color: #c8d6e5; margin-bottom: 40px; letter-spacing: 2px; }
+        
+        .btn {
+            pointer-events: auto; padding: 15px 40px; font-size: 20px; font-weight: bold;
+            background: transparent; color: #00d2d3; border: 2px solid #00d2d3; border-radius: 30px;
+            text-transform: uppercase; cursor: pointer; transition: all 0.2s; margin: 10px;
+            box-shadow: 0 0 15px rgba(0, 210, 211, 0.2);
+        }
+        .btn:active { background: #00d2d3; color: #0b0c10; }
+        
+        #hud {
+            position: absolute; top: 20px; left: 20px; right: 20px; display: flex;
+            justify-content: space-between; align-items: flex-start; pointer-events: none;
+        }
+        .hud-text { font-size: 22px; font-weight: bold; color: #fff; }
+        .hud-accent { color: #00d2d3; }
+        
+        #jokers {
+            position: absolute; bottom: 30px; left: 0; width: 100%; display: flex;
+            justify-content: space-evenly; pointer-events: none;
+        }
+        .joker-btn {
+            pointer-events: auto; width: 60px; height: 60px; border-radius: 50%;
+            background: rgba(11, 12, 16, 0.8); border: 2px solid #ff9f43; color: #ff9f43;
+            font-size: 14px; font-weight: bold; display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+        }
+        .joker-btn:active { background: #ff9f43; color: #0b0c10; }
+        
+        #messageBox {
+            position: absolute; top: 30%; width: 100%; text-align: center;
+            font-size: 28px; font-weight: bold; color: #ff9f43; text-shadow: 0 0 10px #ff9f43;
+            transition: opacity 0.5s; opacity: 0;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas"></canvas>
+    
+    <div id="menuUI" class="ui-layer">
+        <h1>ORBITA</h1>
+        <p class="subtitle">ANADOLU BİLİMKURGU</p>
+        <button class="btn" id="btnPlay">JOURNEY'E BAŞLA</button>
+        <button class="btn" id="btnTutorial" style="border-color: #ff9f43; color: #ff9f43; box-shadow: 0 0 15px rgba(255, 159, 67, 0.2);">EĞİTİM</button>
+    </div>
+
+    <div id="hud" class="hidden">
+        <div class="hud-text">LEVEL <span id="lblLevel" class="hud-accent">1</span></div>
+        <div class="hud-text">İĞNE: <span id="lblPins" class="hud-accent">10</span></div>
+    </div>
+
+    <div id="jokers" class="hidden">
+        <button class="joker-btn" id="btnShield">KALKAN<br><span id="lblShieldCount">3</span></button>
+        <button class="joker-btn" id="btnRisk" style="border-color:#ff4757; color:#ff4757;">RİSK<br>x2</button>
+        <button class="joker-btn" id="btnSlow">YAVAŞ<br><span id="lblSlowCount">3</span></button>
+    </div>
+
+    <div id="messageBox">PERFECT PULSE!</div>
+
+    <div id="resultUI" class="ui-layer hidden" style="background: rgba(11, 12, 16, 0.9);">
+        <h1 id="resTitle" style="color: #1dd1a1; text-shadow: 0 0 20px #1dd1a1;">LEVEL GEÇİLDİ</h1>
+        <button class="btn" id="btnNext">DEVAM ET</button>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
