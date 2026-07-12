@@ -8,6 +8,7 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class MainActivity extends Activity {
     private GameView gameView;
@@ -17,14 +18,13 @@ public class MainActivity extends Activity {
     private TextView lblLevel, lblPins, lblResultTitle;
     private Button btnPlay, btnNext, btnShield, btnRisk;
 
-    private int currentLevel = 1;
+    private int currentLevelId = 1;
     private int shields = 3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
-        // Fullscreen Immersive
         getWindow().getDecorView().setSystemUiVisibility(
             View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY |
             View.SYSTEM_UI_FLAG_FULLSCREEN |
@@ -52,7 +52,7 @@ public class MainActivity extends Activity {
         btnPlay.setOnClickListener(v -> startGame());
         btnNext.setOnClickListener(v -> {
             if (lblResultTitle.getText().toString().contains("GEÇİLDİ")) {
-                currentLevel++;
+                currentLevelId++;
                 startGame();
             } else {
                 resultUI.setVisibility(View.GONE);
@@ -63,6 +63,7 @@ public class MainActivity extends Activity {
         btnRisk.setOnClickListener(v -> {
             gameView.riskMode = !gameView.riskMode;
             btnRisk.setBackgroundColor(gameView.riskMode ? Color.parseColor("#ff4757") : Color.DKGRAY);
+            btnRisk.setTextColor(gameView.riskMode ? Color.WHITE : Color.parseColor("#ff4757"));
         });
 
         btnShield.setOnClickListener(v -> {
@@ -79,16 +80,21 @@ public class MainActivity extends Activity {
         resultUI.setVisibility(View.GONE);
         hudUI.setVisibility(View.VISIBLE);
         
-        lblLevel.setText("LEVEL " + currentLevel);
-        int targetPins = 5 + (currentLevel * 2);
-        float speed = 1.0f + (currentLevel * 0.2f);
+        LevelData data = LevelData.getLevel(currentLevelId);
+        lblLevel.setText("LEVEL " + currentLevelId + ": " + data.name);
         
-        updatePinsUI(targetPins);
-        gameView.startLevel(targetPins, speed);
+        updatePinsUI(data.targetPins);
+        gameView.startLevel(currentLevelId);
     }
 
     public void updatePinsUI(int count) {
         runOnUiThread(() -> lblPins.setText("Kalan: " + count));
+    }
+    
+    public void showToast(String msg) {
+        runOnUiThread(() -> {
+            Toast.makeText(MainActivity.this, msg, Toast.LENGTH_SHORT).show();
+        });
     }
 
     public void showResult(boolean isWin) {
@@ -97,9 +103,11 @@ public class MainActivity extends Activity {
         if (isWin) {
             lblResultTitle.setText("LEVEL GEÇİLDİ!");
             lblResultTitle.setTextColor(Color.parseColor("#1dd1a1"));
+            btnNext.setText("SONRAKİ LEVEL");
         } else {
             lblResultTitle.setText("ÇARPIŞMA!");
             lblResultTitle.setTextColor(Color.parseColor("#ff4757"));
+            btnNext.setText("MENÜYE DÖN");
         }
     }
 }
