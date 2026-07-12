@@ -3,13 +3,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- THE GAME ENGINE VIEW -->
+    <!-- NATIVE JAVA ENGINE VIEW -->
     <com.orbita.rokclone.GameView
         android:id="@+id/gameView"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <!-- TOP HUD (Resources) -->
+    <!-- TOP HUD -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -19,23 +19,14 @@
         android:gravity="center_horizontal">
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="GÜÇ: 1,500"
-            android:textColor="#FFD700"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:layout_marginEnd="30dp"/>
-
-        <TextView
             android:id="@+id/txtFood"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="YİYECEK: 500"
             android:textColor="#FFFFFF"
-            android:textSize="18sp"
+            android:textSize="20sp"
             android:textStyle="bold"
-            android:layout_marginEnd="30dp"/>
+            android:layout_marginEnd="40dp"/>
 
         <TextView
             android:id="@+id/txtWood"
@@ -43,11 +34,11 @@
             android:layout_height="wrap_content"
             android:text="ODUN: 1000"
             android:textColor="#FFFFFF"
-            android:textSize="18sp"
+            android:textSize="20sp"
             android:textStyle="bold"/>
     </LinearLayout>
 
-    <!-- BOTTOM ACTION BAR -->
+    <!-- BOTTOM BAR -->
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -57,11 +48,13 @@
 
         <Button
             android:id="@+id/btnBuildFarm"
-            android:layout_width="140dp"
-            android:layout_height="60dp"
+            android:layout_width="160dp"
+            android:layout_height="70dp"
             android:text="ÇİFTLİK KUR\n(100 Odun)"
             android:backgroundTint="#8B4513"
-            android:textColor="#FFFFFF"/>
+            android:textColor="#FFFFFF"
+            android:textSize="16sp"
+            android:textStyle="bold"/>
     </LinearLayout>
 
 </FrameLayout>
