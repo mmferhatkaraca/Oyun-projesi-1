@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GameView extends SurfaceView implements SurfaceHolder.Callback {
-    private GameThread thread = null;
+    private GameThread thread;
     private MainActivity activity;
 
     private int width, height, centerX, centerY;
@@ -300,6 +300,43 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
             } else {
                 v.vibrate(ms);
             }
+        }
+    }
+}
+
+class GameThread extends Thread {
+    private SurfaceHolder surfaceHolder;
+    private GameView gameView;
+    private boolean running;
+
+    public GameThread(SurfaceHolder surfaceHolder, GameView gameView) {
+        super();
+        this.surfaceHolder = surfaceHolder;
+        this.gameView = gameView;
+    }
+
+    public void setRunning(boolean isRunning) {
+        running = isRunning;
+    }
+
+    @Override
+    public void run() {
+        while (running) {
+            Canvas canvas = null;
+            try {
+                canvas = this.surfaceHolder.lockCanvas();
+                synchronized(surfaceHolder) {
+                    this.gameView.update();
+                    this.gameView.draw(canvas);
+                }
+            } catch (Exception e) {
+            } finally {
+                if (canvas != null) {
+                    try { surfaceHolder.unlockCanvasAndPost(canvas); }
+                    catch (Exception e) { e.printStackTrace(); }
+                }
+            }
+            try { sleep(16); } catch (Exception e) {}
         }
     }
 }
