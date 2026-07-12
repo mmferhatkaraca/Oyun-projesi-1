@@ -1,4 +1,4 @@
-name: Build RoK Native APK
+name: Build Flow Arena Native APK
 
 on:
   push:
@@ -21,10 +21,13 @@ jobs:
       - name: Setup Gradle
         run: |
           chmod +x ./gradlew || true
+
+      - name: Build APK with Gradle
+        run: |
           ./gradlew assembleDebug
 
       - name: Upload Native APK
         uses: actions/upload-artifact@v4
         with:
-          name: RiseOfRealms-Native-Android-APK
+          name: ORBITA-Flow-Arena-Final
           path: app/build/outputs/apk/debug/app-debug.apk
