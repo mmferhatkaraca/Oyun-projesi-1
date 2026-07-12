@@ -1,3 +1,2 @@
 # ORBITA: FLOW ARENA
-
-Oyun motoru değişikliği yapılarak Godot terk edildi, proje Unity (C#) mimarisine taşınmaya başlanıyor.
+Proje %100 Native Android Java (Android Studio) altyapısına geçmiştir.
