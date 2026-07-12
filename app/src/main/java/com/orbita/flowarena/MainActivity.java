@@ -50,8 +50,9 @@ public class MainActivity extends Activity {
         btnShield = findViewById(R.id.btnShield);
         btnRisk = findViewById(R.id.btnRisk);
 
-        // Ensure GameView is rendering in background
+        // Arayüz Z-Index (Derinlik) Ayarları - Oyun ekranının arkada kalmaması için!
         gameView.setVisibility(View.VISIBLE);
+        menuUI.bringToFront();
 
         btnPlay.setOnClickListener(v -> startGame());
         btnNext.setOnClickListener(v -> {
@@ -61,6 +62,7 @@ public class MainActivity extends Activity {
             } else {
                 resultUI.setVisibility(View.GONE);
                 menuUI.setVisibility(View.VISIBLE);
+                menuUI.bringToFront();
             }
         });
 
@@ -85,14 +87,23 @@ public class MainActivity extends Activity {
     private void startGame() {
         menuUI.setVisibility(View.GONE);
         resultUI.setVisibility(View.GONE);
+        
+        gameView.setVisibility(View.VISIBLE);
         hudUI.setVisibility(View.VISIBLE);
+        
+        // BUNLAR ÇOK ÖNEMLİ - OYUNU EKRANIN ÖNÜNE GETİRİR
+        gameView.bringToFront();
+        hudUI.bringToFront();
+        
+        // EKRANIN YENİLENMESİNİ ZORLA
+        gameView.invalidate();
+        hudUI.invalidate();
         
         LevelData data = LevelData.getLevel(currentLevelId);
         lblLevel.setText("LEVEL " + currentLevelId);
         
         updatePinsUI(data.targetPins);
         
-        // Reset Risk UI
         btnRisk.setBackgroundColor(Color.parseColor("#FF4757"));
         btnRisk.setText("RİSK MODU");
 
@@ -113,6 +124,8 @@ public class MainActivity extends Activity {
         runOnUiThread(() -> {
             hudUI.setVisibility(View.GONE);
             resultUI.setVisibility(View.VISIBLE);
+            resultUI.bringToFront();
+            
             if (isWin) {
                 lblResultTitle.setText("LEVEL TAMAMLANDI!");
                 lblResultTitle.setTextColor(Color.parseColor("#1DD1A1"));
