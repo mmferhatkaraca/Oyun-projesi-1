@@ -12,19 +12,13 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Setup Java
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'temurin'
-          java-version: '17'
-
-      - name: Setup Godot Engine
+      - name: Download Godot Engine
         run: |
           wget -q https://github.com/godotengine/godot/releases/download/4.3-stable/Godot_v4.3-stable_linux.x86_64.zip
           unzip -q Godot_v4.3-stable_linux.x86_64.zip
           chmod +x Godot_v4.3-stable_linux.x86_64
 
-      - name: Setup Godot Android Template
+      - name: Download Godot Android Template
         run: |
           wget -q https://github.com/godotengine/godot/releases/download/4.3-stable/Godot_v4.3-stable_export_templates.tpz
           unzip -q Godot_v4.3-stable_export_templates.tpz templates/android_debug.apk
@@ -36,13 +30,15 @@ jobs:
       - name: Setup Android SDK Build Tools
         uses: android-actions/setup-android@v3
 
-      - name: Build RoK Custom Engine APK
+      - name: Export and Inject PCK
         run: |
           yes | sdkmanager "build-tools;34.0.0"
           
+          # Use pre-import trick to warm up Godot cache to prevent missing project data errors
+          cd orbita-godot
+          ../Godot_v4.3-stable_linux.x86_64 --headless --editor --quit || true
+          
           # Godot üzerinden oyunu PCK (Veri Paketi) olarak al
-          # Working directory is the repo root, Godot is in orbita-godot
-          cd orbita-godot || { echo "orbita-godot not found"; exit 1; }
           ../Godot_v4.3-stable_linux.x86_64 --headless --export-pack "PCK" orbita.pck
           cd ..
           
